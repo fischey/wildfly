@@ -32,6 +32,7 @@ import org.jboss.as.server.deployment.DeploymentUnitProcessor;
 import org.jboss.modules.Module;
 
 /**
+ *
  */
 public class SubsystemDeploymentProcessor implements DeploymentUnitProcessor {
 
@@ -44,8 +45,11 @@ public class SubsystemDeploymentProcessor implements DeploymentUnitProcessor {
     public void deploy(DeploymentPhaseContext phaseContext) {
         DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
         Module module = deploymentUnit.getAttachment(Attachments.MODULE);
-
+        final ClassLoader parent = module.getClassLoader().getParent();
         Config config = ConfigProviderResolver.instance().getConfig(module.getClassLoader());
+        if (parent != null) {
+            ConfigProviderResolver.instance().registerConfig(config, parent);
+        }
         deploymentUnit.putAttachment(CONFIG, config);
     }
 
